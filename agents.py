@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-from crewai import Agent
+from crewai import Agent, LLM
 
 from tools.devin_api_tool import DevinCreateSessionTool, DevinGetSessionTool
 
+# Default model — Google Gemini 3.5 Flash via LiteLLM
+DEFAULT_MODEL = "gemini/gemini-3.5-flash"
 
-def build_project_manager_agent() -> Agent:
+
+def build_project_manager_agent(model: str = DEFAULT_MODEL) -> Agent:
     """Build a Project Manager Agent.
 
     Responsibilities:
@@ -15,6 +18,8 @@ def build_project_manager_agent() -> Agent:
     2. Translate and expand it into a detailed, English technical task.
     3. Call the Devin API to create a new session with that task.
     """
+    llm = LLM(model=model)
+
     return Agent(
         role="Project Manager",
         goal=(
@@ -30,6 +35,7 @@ def build_project_manager_agent() -> Agent:
             "prompt in English. You then use the Devin API tool to dispatch "
             "the task automatically."
         ),
+        llm=llm,
         tools=[DevinCreateSessionTool(), DevinGetSessionTool()],
         verbose=True,
         allow_delegation=False,

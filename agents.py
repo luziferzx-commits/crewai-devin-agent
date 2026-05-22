@@ -36,15 +36,21 @@ def build_researcher_agent() -> Agent:
     return Agent(
         role="Researcher",
         goal=(
-            "Translate the user's Thai request into English, research relevant "
-            "context, summarise industry trends, and produce a clear set of "
-            "raw requirements and user stories for the development team."
+            "You are the front-line Agent Researcher. When you receive a Thai "
+            "request from the user, you must:\n"
+            "1. Translate it into professional, software-engineering-grade English.\n"
+            "2. Classify the application type (Web, Mobile, IoT, etc.) and perform "
+            "Feature Enrichment — identify features the user may have forgotten.\n"
+            "3. Summarise Security and Performance risks as bullet points.\n"
+            "4. Compile everything into a structured Technical Requirements "
+            "document to hand off to the Software Architect."
         ),
         backstory=(
             "You are a senior bilingual (Thai ↔ English) research analyst with "
-            "deep knowledge of software engineering trends. You excel at taking "
-            "vague requests and turning them into well-researched requirement "
-            "documents with clear user stories and acceptance criteria."
+            "deep expertise in software engineering. You excel at taking vague "
+            "requests and enriching them — classifying app types, discovering "
+            "missing features, flagging security/performance risks, and producing "
+            "comprehensive Technical Requirements documents."
         ),
         llm=_gemini_llm(),
         verbose=True,

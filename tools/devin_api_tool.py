@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import os
-from typing import Optional
+from typing import Optional, Type
 
 import httpx
 from crewai.tools import BaseTool
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 
 DEVIN_API_BASE = "https://api.devin.ai/v3"
@@ -30,16 +30,25 @@ def _org_id() -> str:
     return org_id
 
 
+class DevinCreateSessionToolSchema(BaseModel):
+    """Input schema for DevinCreateSessionTool."""
+    prompt: str = Field(
+        ...,
+        description="A detailed technical prompt in English describing the task for Devin to implement.",
+    )
+
+
 class DevinCreateSessionTool(BaseTool):
     """Create a new Devin session via the v3 REST API."""
 
     name: str = "devin_create_session"
     description: str = (
-        "Creates a new Devin session (triggers a new job). "
-        "Input MUST be a detailed technical prompt in English describing the task. "
-        "Returns the session URL and ID so you can track progress."
+        "Creates a new Devin session (triggers a new coding job). "
+        "You MUST pass a 'prompt' argument containing a detailed technical "
+        "prompt in English. Example: devin_create_session(prompt='Build a ...'). "
+        "Returns the session URL and ID."
     )
-    # Optional: attribute session to a specific user
+    args_schema: Type[BaseModel] = DevinCreateSessionToolSchema
     create_as_user_id: Optional[str] = Field(
         default=None,
         description="User ID to attribute the session to (optional).",
@@ -73,14 +82,25 @@ class DevinCreateSessionTool(BaseTool):
             return f"❌ Failed to create session: {exc}"
 
 
+class DevinGetSessionToolSchema(BaseModel):
+    """Input schema for DevinGetSessionTool."""
+    session_id: str = Field(
+        ...,
+        description="The Devin session ID (UUID string) to retrieve details for.",
+    )
+
+
 class DevinGetSessionTool(BaseTool):
     """Retrieve details about an existing Devin session."""
 
     name: str = "devin_get_session"
     description: str = (
-        "Get the current status and details of a Devin session. "
-        "Input should be a Devin session ID (UUID string)."
+        "Get the current status of a Devin session. "
+        "You MUST pass a 'session_id' argument. "
+        "Example: devin_get_session(session_id='abc123...'). "
+        "Returns session status, title, and URL."
     )
+    args_schema: Type[BaseModel] = DevinGetSessionToolSchema
 
     def _run(self, session_id: str) -> str:
         org_id = _org_id()

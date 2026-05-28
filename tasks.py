@@ -84,18 +84,16 @@ def build_dispatch_task(agent: Agent, architecture_task: Task) -> Task:
         description=(
             "## Your Instructions\n"
             "1. Take the Technical Specification from the Architect.\n"
-            "2. **Format** it into an optimal prompt for Devin — include all\n"
-            "   technical details, stack choices, and acceptance criteria.\n"
-            "   The prompt should be self-contained (Devin won't see previous context).\n"
-            "3. **Call** the `devin_create_session` tool with the formatted prompt.\n"
-            "4. **Return** a summary in Thai that includes:\n"
-            "   - What was dispatched (brief project description)\n"
-            "   - Key technical decisions made\n"
-            "   - The Devin session URL for tracking\n"
+            "2. **Format** it into a single, self-contained prompt for Devin AI.\n"
+            "   The prompt must include ALL technical details, stack choices,\n"
+            "   implementation steps, and acceptance criteria.\n"
+            "   Devin will NOT see any previous context — the prompt must stand alone.\n"
+            "3. Output ONLY the formatted Devin prompt in English — no commentary,\n"
+            "   no wrapper text, no Thai summary. Just the prompt itself.\n"
         ),
         expected_output=(
-            "A Thai-language summary confirming the task was dispatched to Devin, "
-            "including key technical decisions and the Devin session URL."
+            "A single, self-contained English prompt for Devin AI containing "
+            "all technical details, implementation steps, and acceptance criteria."
         ),
         agent=agent,
         context=[architecture_task],

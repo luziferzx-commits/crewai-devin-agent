@@ -10,10 +10,9 @@ from __future__ import annotations
 
 from crewai import Agent, LLM
 
-from tools.devin_api_tool import DevinCreateSessionTool, DevinGetSessionTool
 
 # ─── LLM Configurations ──────────────────────────────────────────────────────
-GEMINI_MODEL = "gemini/gemini-3.5-flash"
+GEMINI_MODEL = "gemini/gemini-2.5-flash"
 CLAUDE_MODEL = "anthropic/claude-sonnet-4-6"
 
 
@@ -86,26 +85,27 @@ def build_architect_agent() -> Agent:
 
 
 def build_dispatcher_agent() -> Agent:
-    """Agent 3 — Dispatcher (Claude 3.5 Sonnet + Devin Tools).
+    """Agent 3 — Dispatcher (Claude 3.5 Sonnet).
 
-    Takes the Technical Specification and dispatches it as a new Devin
-    session via the API.
+    Takes the Technical Specification and formats it as an optimal
+    Devin prompt. The actual API call is handled by main.py.
     """
     return Agent(
         role="Devin Dispatcher",
         goal=(
-            "Take the final Technical Specification, format it as an optimal "
-            "Devin prompt, and create a new Devin session to execute the task. "
-            "Return the session URL and a Thai-language summary to the user."
+            "Take the final Technical Specification and format it as an "
+            "optimal, self-contained prompt for Devin AI. The prompt must "
+            "include all technical details, stack choices, implementation "
+            "steps, and acceptance criteria. Output ONLY the Devin prompt "
+            "in English — nothing else."
         ),
         backstory=(
-            "You are an expert at interfacing with Devin AI. You know how to "
-            "write prompts that maximise Devin's effectiveness — clear, "
-            "structured, with explicit acceptance criteria. After dispatching, "
-            "you confirm success and provide a summary in Thai."
+            "You are an expert at writing prompts for Devin AI. You know "
+            "how to structure tasks for maximum effectiveness — clear sections, "
+            "explicit acceptance criteria, and zero ambiguity. You produce a "
+            "single, self-contained prompt that Devin can execute independently."
         ),
         llm=_claude_llm(),
-        tools=[DevinCreateSessionTool(), DevinGetSessionTool()],
         verbose=True,
         allow_delegation=False,
     )
